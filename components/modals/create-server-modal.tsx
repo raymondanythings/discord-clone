@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button'
 import { FileUpload } from '@/components/file-upload'
 import { useRouter } from 'next/navigation'
 import { useModal } from '@/hooks/use-modal-store'
+import { useCallback } from 'react'
 
 const formSchema = z.object({
 	name: z.string().min(1, {
@@ -37,7 +38,7 @@ const formSchema = z.object({
 })
 
 const CreateServerModal = () => {
-	const { onClose, type } = useModal()
+	const { onClose, type, isOpen } = useModal()
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -50,7 +51,7 @@ const CreateServerModal = () => {
 
 	const isLoading = form.formState.isSubmitting
 
-	const isModalOpen = type === 'CREATE_SERVER'
+	const isModalOpen = isOpen && type === 'CREATE_SERVER'
 
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		try {
@@ -64,8 +65,13 @@ const CreateServerModal = () => {
 		}
 	}
 
+	const handleClose = useCallback(() => {
+		form.reset()
+		onClose()
+	}, [form, onClose])
+
 	return (
-		<Dialog open={isModalOpen} onOpenChange={onClose}>
+		<Dialog open={isModalOpen} onOpenChange={handleClose}>
 			<DialogContent className="bg-white text-black p-0 overflow-hidden">
 				<DialogHeader className="pt-8 px-6">
 					<DialogTitle className="text-2xl text-center font-bold">
