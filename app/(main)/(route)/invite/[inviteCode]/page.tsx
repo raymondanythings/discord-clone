@@ -3,7 +3,6 @@ import CheckParamHOC, {
 } from '@/components/hoc/check-param-hoc'
 import { db } from '@/lib/db'
 import { getProfile } from '@/lib/server'
-import { WithParam } from '@/types/server'
 import { Profile } from '@prisma/client'
 import { redirect } from 'next/navigation'
 import React from 'react'

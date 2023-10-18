@@ -65,9 +65,6 @@ const ServerSidebar = async ({ serverId, profileId }: ServerSidebarProps) => {
 			{server.channels.map((channel) => (
 				<div key={channel.id}>{channel.name}</div>
 			))}
-			{members.map((members) => (
-				<div key={members.id}>{members.profile.name}</div>
-			))}
 		</div>
 	)
 }

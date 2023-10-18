@@ -27,7 +27,7 @@ import { FileUpload } from '@/components/file-upload'
 import { useRouter } from 'next/navigation'
 import { useModal } from '@/hooks/use-modal-store'
 
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 
 const formSchema = z.object({
 	name: z.string().min(1, {
@@ -67,21 +67,15 @@ const EditServerModal = () => {
 		}
 	}
 
-	const handleClose = useCallback(() => {
-		form.reset()
-		onClose()
-	}, [form, onClose])
-
 	useEffect(() => {
-		if (isModalOpen && server) {
+		if (server) {
 			form.setValue('name', server.name)
 			form.setValue('imageUrl', server.imageUrl)
 		}
-		console.log(form.getValues())
 	}, [form, isModalOpen, server])
 
 	return (
-		<Dialog open={isModalOpen} onOpenChange={handleClose}>
+		<Dialog open={isModalOpen} onOpenChange={onClose}>
 			<DialogContent className="bg-white text-black p-0 overflow-hidden">
 				<DialogHeader className="pt-8 px-6">
 					<DialogTitle className="text-2xl text-center font-bold">
