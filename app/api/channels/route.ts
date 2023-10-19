@@ -2,12 +2,15 @@ import { MemberRole } from '@prisma/client'
 
 import { ApiExeption } from '@/lib/api'
 import { db } from '@/lib/db'
-import { getProfile } from '@/lib/server'
 import { NextResponse } from 'next/server'
+import { currentProfile } from '@/lib/current-profile'
 
 export async function POST(req: Request) {
 	try {
-		const profile = await getProfile()
+		const profile = await currentProfile()
+
+		if (!profile) return ApiExeption.throw(401)
+
 		const { name, type } = await req.json()
 		const { searchParams } = new URL(req.url)
 

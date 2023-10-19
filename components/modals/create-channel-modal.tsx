@@ -134,6 +134,7 @@ const CreateChannelModal = () => {
 													<SelectValue placeholder="Select a channel type" />
 												</SelectTrigger>
 											</FormControl>
+
 											<SelectContent>
 												{Object.values(ChannelType).map((type) => (
 													<SelectItem

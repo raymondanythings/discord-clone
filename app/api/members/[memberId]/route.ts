@@ -1,6 +1,6 @@
 import { ApiExeption } from '@/lib/api'
+import { currentProfile } from '@/lib/current-profile'
 import { db } from '@/lib/db'
-import { getProfile } from '@/lib/server'
 import { WithParam } from '@/types/server'
 import { NextResponse } from 'next/server'
 
@@ -9,7 +9,8 @@ export async function DELETE(
 	{ params: { memberId } }: WithParam<'memberId'>,
 ) {
 	try {
-		const profile = await getProfile()
+		const profile = await currentProfile()
+		if (!profile) return ApiExeption.throw(401)
 		const { searchParams } = new URL(req.url)
 		const serverId = searchParams.get('serverId')
 
@@ -54,7 +55,8 @@ export async function PATCH(
 	{ params: { memberId } }: WithParam<'memberId'>,
 ) {
 	try {
-		const profile = await getProfile()
+		const profile = await currentProfile()
+		if (!profile) return ApiExeption.throw(401)
 		const { searchParams } = new URL(req.url)
 		const serverId = searchParams.get('serverId')
 		const { role } = await req.json()
