@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import React from 'react'
+import React, { createElement } from 'react'
 import { ChannelType, MemberRole } from '@prisma/client'
 
 import { ServerInfo } from '@/types/server'
@@ -7,21 +7,19 @@ import { ServerInfo } from '@/types/server'
 import { db } from '@/lib/db'
 
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
 
 import ServerHeader from './server-header'
 import ServerSearch from './server-search'
+import ServerSection from './server-section'
 
-import { Hash, Mic, ShieldAlert, ShieldCheck, Video } from 'lucide-react'
+import { ShieldAlert, ShieldCheck } from 'lucide-react'
+import ServerChannel from './server-channel'
+import { iconMap } from '@/common'
 
 interface ServerSidebarProps {
 	serverId: string
 	profileId: string
-}
-
-const iconMap = {
-	[ChannelType.TEXT]: <Hash className="mr-2 h-4 w-4" />,
-	[ChannelType.AUDIO]: <Mic className="mr-2 h-4 w-4" />,
-	[ChannelType.VIDEO]: <Video className="mr-2 h-4 w-4" />,
 }
 
 const roleIconMap = {
@@ -29,7 +27,7 @@ const roleIconMap = {
 	[MemberRole.MODERATOR]: (
 		<ShieldCheck className="mr-2 h-4 w-4 text-indigo-500" />
 	),
-	[MemberRole.ADMIN]: <ShieldAlert className="mr-2 h-4 w-4 text-indigo-500" />,
+	[MemberRole.ADMIN]: <ShieldAlert className="mr-2 h-4 w-4 text-red-500" />,
 }
 
 const ServerSidebar = async ({ serverId, profileId }: ServerSidebarProps) => {
@@ -88,11 +86,15 @@ const ServerSidebar = async ({ serverId, profileId }: ServerSidebarProps) => {
 							{
 								label: 'Text Channles',
 								type: 'channel',
-								data: serverInfo.TEXT.map((channel) => ({
-									id: channel.id,
-									name: channel.name,
-									icon: iconMap[channel.type],
-								})),
+								data: serverInfo.TEXT.map((channel) => {
+									return {
+										id: channel.id,
+										name: channel.name,
+										icon: createElement(iconMap[channel.type], {
+											className: 'mr-2 h-4 w-4',
+										}),
+									}
+								}),
 							},
 							{
 								label: 'Voice Channles',
@@ -100,7 +102,9 @@ const ServerSidebar = async ({ serverId, profileId }: ServerSidebarProps) => {
 								data: serverInfo.AUDIO.map((channel) => ({
 									id: channel.id,
 									name: channel.name,
-									icon: iconMap[channel.type],
+									icon: createElement(iconMap[channel.type], {
+										className: 'mr-2 h-4 w-4',
+									}),
 								})),
 							},
 							{
@@ -109,7 +113,9 @@ const ServerSidebar = async ({ serverId, profileId }: ServerSidebarProps) => {
 								data: serverInfo.VIDEO.map((channel) => ({
 									id: channel.id,
 									name: channel.name,
-									icon: iconMap[channel.type],
+									icon: createElement(iconMap[channel.type], {
+										className: 'mr-2 h-4 w-4',
+									}),
 								})),
 							},
 							{
@@ -124,9 +130,53 @@ const ServerSidebar = async ({ serverId, profileId }: ServerSidebarProps) => {
 						]}
 					/>
 				</div>
-				{server.channels.map((channel) => (
-					<div key={channel.id}>{channel.name}</div>
-				))}
+				<Separator className="bg-zinc-200 dark:bg-zinc-700 rounded-md my-2" />
+				{!!serverInfo.TEXT.length && (
+					<div className="mb-2">
+						<ServerSection
+							sectionType="channels"
+							channelType={ChannelType.TEXT}
+							role={serverInfo.loggedInUser?.role}
+							label="Text Channels"
+						/>
+						{serverInfo.TEXT.map((channel) => (
+							<ServerChannel
+								key={channel.id}
+								server={server}
+								channel={channel}
+								role={serverInfo.loggedInUser?.role}
+							/>
+						))}
+						<ServerSection
+							sectionType="channels"
+							channelType={ChannelType.AUDIO}
+							role={serverInfo.loggedInUser?.role}
+							label="Audio Channels"
+						/>
+						{serverInfo.AUDIO.map((channel) => (
+							<ServerChannel
+								key={channel.id}
+								server={server}
+								channel={channel}
+								role={serverInfo.loggedInUser?.role}
+							/>
+						))}
+						<ServerSection
+							sectionType="channels"
+							channelType={ChannelType.AUDIO}
+							role={serverInfo.loggedInUser?.role}
+							label="Video Channels"
+						/>
+						{serverInfo.VIDEO.map((channel) => (
+							<ServerChannel
+								key={channel.id}
+								server={server}
+								channel={channel}
+								role={serverInfo.loggedInUser?.role}
+							/>
+						))}
+					</div>
+				)}
 			</ScrollArea>
 		</div>
 	)
