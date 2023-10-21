@@ -16,6 +16,7 @@ import ServerSection from './server-section'
 import { ShieldAlert, ShieldCheck } from 'lucide-react'
 import ServerChannel from './server-channel'
 import { iconMap } from '@/common'
+import ServerMember from './server-member'
 
 interface ServerSidebarProps {
 	serverId: string
@@ -108,7 +109,7 @@ const ServerSidebar = async ({ serverId, profileId }: ServerSidebarProps) => {
 								})),
 							},
 							{
-								label: 'Video Channles',
+								label: 'Video Channels',
 								type: 'channel',
 								data: serverInfo.VIDEO.map((channel) => ({
 									id: channel.id,
@@ -131,14 +132,15 @@ const ServerSidebar = async ({ serverId, profileId }: ServerSidebarProps) => {
 					/>
 				</div>
 				<Separator className="bg-zinc-200 dark:bg-zinc-700 rounded-md my-2" />
-				{!!serverInfo.TEXT.length && (
-					<div className="mb-2">
-						<ServerSection
-							sectionType="channels"
-							channelType={ChannelType.TEXT}
-							role={serverInfo.loggedInUser?.role}
-							label="Text Channels"
-						/>
+
+				<div className="mb-2">
+					<ServerSection
+						sectionType="channels"
+						channelType={ChannelType.TEXT}
+						role={serverInfo.loggedInUser?.role}
+						label="Text Channels"
+					/>
+					<div className="space-y-[2px]">
 						{serverInfo.TEXT.map((channel) => (
 							<ServerChannel
 								key={channel.id}
@@ -147,26 +149,16 @@ const ServerSidebar = async ({ serverId, profileId }: ServerSidebarProps) => {
 								role={serverInfo.loggedInUser?.role}
 							/>
 						))}
-						<ServerSection
-							sectionType="channels"
-							channelType={ChannelType.AUDIO}
-							role={serverInfo.loggedInUser?.role}
-							label="Audio Channels"
-						/>
-						{serverInfo.AUDIO.map((channel) => (
-							<ServerChannel
-								key={channel.id}
-								server={server}
-								channel={channel}
-								role={serverInfo.loggedInUser?.role}
-							/>
-						))}
-						<ServerSection
-							sectionType="channels"
-							channelType={ChannelType.AUDIO}
-							role={serverInfo.loggedInUser?.role}
-							label="Video Channels"
-						/>
+					</div>
+				</div>
+				<div className="mb-2">
+					<ServerSection
+						sectionType="channels"
+						channelType={ChannelType.VIDEO}
+						role={serverInfo.loggedInUser?.role}
+						label="Video Channels"
+					/>
+					<div className="space-y-[2px]">
 						{serverInfo.VIDEO.map((channel) => (
 							<ServerChannel
 								key={channel.id}
@@ -176,7 +168,38 @@ const ServerSidebar = async ({ serverId, profileId }: ServerSidebarProps) => {
 							/>
 						))}
 					</div>
-				)}
+				</div>
+				<div className="mb-2">
+					<ServerSection
+						sectionType="channels"
+						channelType={ChannelType.AUDIO}
+						role={serverInfo.loggedInUser?.role}
+						label="Audio Channels"
+					/>
+					<div className="space-y-[2px]">
+						{serverInfo.AUDIO.map((channel) => (
+							<ServerChannel
+								key={channel.id}
+								server={server}
+								channel={channel}
+								role={serverInfo.loggedInUser?.role}
+							/>
+						))}
+					</div>
+				</div>
+				<div className="mb-2">
+					<ServerSection
+						sectionType="members"
+						role={serverInfo.loggedInUser?.role}
+						label="Members"
+						server={server}
+					/>
+					<div className="space-y-[2px]">
+						{members.map((member) => (
+							<ServerMember key={member.id} member={member} server={server} />
+						))}
+					</div>
+				</div>
 			</ScrollArea>
 		</div>
 	)
