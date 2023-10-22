@@ -1,13 +1,24 @@
-import ChatHeader from '@/components/chat/chat-header'
 import { getOrCreateConversation } from '@/lib/conversation'
 import { db } from '@/lib/db'
 import { getProfile } from '@/lib/server'
 import { WithParam } from '@/types/server'
 import { redirect } from 'next/navigation'
 
+import ChatHeader from '@/components/chat/chat-header'
+import ChatInput from '@/components/chat/chat-input'
+import ChatMessages from '@/components/chat/chat-messages'
+import MediaRoom from '@/components/media-room'
+
+interface MemberIdPageProps extends WithParam<'serverId' | 'memberId'> {
+	searchParams: {
+		video?: boolean
+	}
+}
+
 const MemberIdPage = async ({
 	params: { memberId, serverId },
-}: WithParam<'serverId' | 'memberId'>) => {
+	searchParams,
+}: MemberIdPageProps) => {
 	const profile = await getProfile()
 
 	const currentMember = await db.member.findFirst({
@@ -30,7 +41,6 @@ const MemberIdPage = async ({
 	const { memberOne, memberTwo } = conversation
 
 	const otherMember = memberOne.profileId === profile.id ? memberTwo : memberOne
-
 	return (
 		<div className="bg-white dark:bg-[#313338] flex flex-col h-full">
 			<ChatHeader
@@ -40,6 +50,31 @@ const MemberIdPage = async ({
 				serverId={serverId}
 				type="conversation"
 			/>
+			{!searchParams?.video ? (
+				<>
+					<ChatMessages
+						member={currentMember}
+						name={otherMember.profile.name}
+						chatId={conversation.id}
+						type="conversation"
+						apiUrl="/api/direct-messages"
+						paramKey="conversationId"
+						paramValue={conversation.id}
+						socketUrl="/api/socket/direct-messages"
+						socketQuery={{ conversationId: conversation.id }}
+					/>
+					<ChatInput
+						name={otherMember.profile.name}
+						type="conversation"
+						apiUrl="/api/socket/direct-messages"
+						query={{
+							conversationId: conversation.id,
+						}}
+					/>
+				</>
+			) : (
+				<MediaRoom chatId={conversation.id} video audio />
+			)}
 		</div>
 	)
 }

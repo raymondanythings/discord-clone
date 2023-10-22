@@ -1,7 +1,7 @@
 import { ApiExeption } from '@/lib/api'
 import { currentProfile } from '@/lib/current-profile'
 import { db } from '@/lib/db'
-import { Message } from '@prisma/client'
+import { DirectMessage, Message } from '@prisma/client'
 import { NextResponse } from 'next/server'
 
 const MESSAGES_BATCH = 15
@@ -13,20 +13,20 @@ export async function GET(req: Request) {
 		const { searchParams } = new URL(req.url)
 
 		const cursor = searchParams.get('cursor')
-		const channelId = searchParams.get('channelId')
+		const conversationId = searchParams.get('conversationId')
 
-		if (!channelId) return ApiExeption.throw(400)
+		if (!conversationId) return ApiExeption.throw(400)
 
-		let messages: Message[]
+		let messages: DirectMessage[]
 		if (cursor) {
-			messages = await db.message.findMany({
+			messages = await db.directMessage.findMany({
 				take: MESSAGES_BATCH,
 				skip: 1,
 				cursor: {
 					id: cursor,
 				},
 				where: {
-					channelId,
+					conversationId,
 				},
 				include: {
 					member: {
@@ -40,10 +40,10 @@ export async function GET(req: Request) {
 				},
 			})
 		} else {
-			messages = await db.message.findMany({
+			messages = await db.directMessage.findMany({
 				take: MESSAGES_BATCH,
 				where: {
-					channelId,
+					conversationId,
 				},
 				include: {
 					member: {
