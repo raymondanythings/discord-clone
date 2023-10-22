@@ -7,7 +7,7 @@ import ChatWelcome from '@/components/chat/chat-welcome'
 import { useChatQuery } from '@/hooks/use-chat-query'
 import { Fragment } from 'react'
 import ChatItem from '@/components/chat/chat-item'
-
+import { format } from 'date-fns'
 interface ChatMessagesProps {
 	name: string
 	member: Member
@@ -19,6 +19,7 @@ interface ChatMessagesProps {
 	paramValue: string
 	type: 'channel' | 'conversation'
 }
+const DATE_FORMAT = 'd MMM yyy, HH:mm '
 
 const ChatMessages = ({
 	apiUrl,
@@ -64,7 +65,19 @@ const ChatMessages = ({
 					return (
 						<Fragment key={i}>
 							{group.items.map((message) => (
-								<ChatItem key={message.id} />
+								<ChatItem
+									key={message.id}
+									content={message.content}
+									currentMember={member}
+									member={message.member}
+									deleted={message.deleted}
+									fileUrl={message.fileUrl}
+									id={message.id}
+									isUpdated={message.updatedAt !== message.createdAt}
+									timestamp={format(new Date(message.createdAt), DATE_FORMAT)}
+									socketQuery={socketQuery}
+									socketUrl={socketUrl}
+								/>
 							))}
 						</Fragment>
 					)
