@@ -1,10 +1,10 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { io as ClientIO } from 'socket.io-client'
+import { io as ClientIO, Socket } from 'socket.io-client'
 
 type SocketContextType = {
-	socket: any | null
+	socket: Socket | null
 	isConnected: boolean
 }
 

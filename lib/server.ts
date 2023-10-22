@@ -8,3 +8,36 @@ export const getProfile = async (): Promise<Profile> => {
 
 	return profile
 }
+import { NextApiResponse, NextApiRequest } from 'next'
+import { NextApiResponseServerIo } from '@/types/server'
+
+export interface ResponseType {
+	ok?: boolean
+	[key: string]: any
+}
+
+type method = 'GET' | 'POST' | 'PATCH' | 'DELETE'
+
+interface ConfigType<T> {
+	methods: method[]
+	handler: (req: NextApiRequest, res: NextApiResponseServerIo) => Promise<T>
+	isPrivate?: boolean
+}
+
+export function withHandler<T = any>({ methods, handler }: ConfigType<T>) {
+	return async function (
+		req: NextApiRequest,
+		res: NextApiResponseServerIo,
+	): Promise<any> {
+		if (req.method && !methods.includes(req.method as any)) {
+			return res.status(405).json({ error: 'Method not allowed' })
+		}
+
+		try {
+			await handler(req, res)
+		} catch (error) {
+			console.error(error)
+			return res.status(500).json({ error })
+		}
+	}
+}

@@ -8,6 +8,7 @@ import { useChatQuery } from '@/hooks/use-chat-query'
 import { Fragment } from 'react'
 import ChatItem from '@/components/chat/chat-item'
 import { format } from 'date-fns'
+import { useChatSocket } from '@/hooks/use-chat-socket'
 interface ChatMessagesProps {
 	name: string
 	member: Member
@@ -33,8 +34,12 @@ const ChatMessages = ({
 	type,
 }: ChatMessagesProps) => {
 	const queryKey = `chat:${chatId}`
+	const addKey = `chat:${chatId}:messages`
+	const updateKey = `chat:${chatId}:messages:update`
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
 		useChatQuery({ queryKey, apiUrl, paramKey, paramValue })
+
+	useChatSocket({ queryKey, addKey, updateKey })
 	if (status === 'pending') {
 		return (
 			<div className="flex flex-col flex-1 justify-center items-center">
